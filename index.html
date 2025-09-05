@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InviStudio™ - Global Enterprise IP Protection Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bd-primary: #1e3d59;
+            --bd-secondary: #006A4E;
+            --bd-accent: #00b368;
+            --bd-light: #f5f9fc;
+            --bd-success: #28a745;
+            --bd-warning: #ffc107;
+            --bd-danger: #dc3545;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(30, 61, 89, 0.15);
+            --text-primary: #2c3e50;
+            --text-secondary: #546e7a;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2f4f0 30%, #d4f1e8 70%, #c8ede0 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(0, 106, 78, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 179, 104, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(30, 61, 89, 0.04) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .navbar {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid rgba(0, 106, 78, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(30, 61, 89, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--bd-primary), var(--bd-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(0, 106, 78, 0.1);
+            border-color: rgba(0, 106, 78, 0.2);
+            backdrop-filter: blur(10px);
+            color: var(--bd-secondary);
+            box-shadow: 0 2px 10px rgba(0, 106, 78, 0.1);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--bd-primary), var(--bd-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .bangladesh-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 106, 78, 0.1);
+            border-radius: 25px;
+            border: 1px solid rgba(0, 106, 78, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+            color: var(--bd-secondary);
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 106, 78, 0.1);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 106, 78, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(30, 61, 89, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(30, 61, 89, 0.12);
+            border-color: rgba(0, 106, 78, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--bd-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 106, 78, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 106, 78, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--bd-secondary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .portfolio-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0, 106, 78, 0.05);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 106, 78, 0.08);
+        }
+
+        .portfolio-item:hover {
+            background: rgba(0, 106, 78, 0.1);
+            transform: translateX(5px);
+            border-color: rgba(0, 106, 78, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 106, 78, 0.1);
+        }
+
+        .renewal-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active { 
+            background: rgba(40, 167, 69, 0.15); 
+            color: var(--bd-success); 
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+        .status-pending { 
+            background: rgba(255, 193, 7, 0.15); 
+            color: #e67e22; 
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        .status-urgent { 
+            background: rgba(220, 53, 69, 0.15); 
+            color: var(--bd-danger); 
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .renewal-dashboard {
+            grid-column: span 3;
+        }
+
+        .renewal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .renewal-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 106, 78, 0.1);
+            box-shadow: 0 4px 20px rgba(30, 61, 89, 0.05);
+        }
+
+        .renewal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--bd-secondary), var(--bd-accent));
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 106, 78, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bd-secondary), var(--bd-accent));
+            transition: width 0.3s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--bd-secondary), var(--bd-accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 106, 78, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--bd-primary);
+            border: 1px solid rgba(0, 106, 78, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 106, 78, 0.25);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--bd-secondary);
+        }
+
+        .alert {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cost-optimizer {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .cost-breakdown {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .cost-savings {
+            color: var(--bd-light-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .renewal-dashboard {
+                grid-column: span 1;
+            }
+            .nav-menu {
+                display: none;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        .floating-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--bd-red), var(--bd-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">InviStudio™</div>
+            <div class="nav-menu">
+                <div class="nav-item active">ড্যাশবোর্ড</div>
+                <div class="nav-item">পোর্টফোলিও</div>
+                <div class="nav-item">রিনিউয়াল</div>
+                <div class="nav-item">অ্যানালিটিক্স</div>
+                <div class="nav-item">সাপোর্ট</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">InviStudio™</h1>
+            <p class="hero-subtitle">Global Enterprise IP Protection Platform</p>
+            <div class="bangladesh-badge">
+                <span>🇧🇩</span>
+                <span>Made in Bangladesh</span>
+                <span>• বিশ্বমানের প্রযুক্তি</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Portfolio Overview -->
+            <div class="glass-card">
+                <h3 class="card-title">পোর্টফোলিও সংক্ষিপ্ত</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">247</div>
+                        <div class="stat-label">Active IPs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Pending Renewals</div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div>
+                        <div>AI Algorithm Patent</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">BD-2024-001247</div>
+                    </div>
+                    <span class="renewal-status status-active">Active</span>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div>
+                        <div>FinTech Innovation</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">BD-2024-001248</div>
+                    </div>
+                    <span class="renewal-status status-pending">30 days</span>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div>
+                        <div>Blockchain Protocol</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">BD-2024-001249</div>
+                    </div>
+                    <span class="renewal-status status-urgent">7 days</span>
+                </div>
+            </div>
+
+            <!-- Main Dashboard -->
+            <div class="glass-card">
+                <h3 class="card-title">Smart Renewal Management</h3>
+                
+                <div class="alert">
+                    <strong>⚠️ Urgent Action Required:</strong> 3 IPs require renewal within 7 days
+                </div>
+                
+                <div class="cost-optimizer">
+                    <h4>Cost Optimization Analysis</h4>
+                    <div class="cost-breakdown">
+                        <span>Traditional Method:</span>
+                        <span>$45,600</span>
+                    </div>
+                    <div class="cost-breakdown">
+                        <span>InviStudio™ Method:</span>
+                        <span>$12,400</span>
+                    </div>
+                    <hr style="margin: 1rem 0; border: 1px solid rgba(255,255,255,0.2);">
+                    <div class="cost-breakdown">
+                        <span>Total Savings:</span>
+                        <span class="cost-savings">$33,200 (73%)</span>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary">Bulk Renew (15 items)</button>
+                    <button class="btn btn-secondary">Schedule Review</button>
+                </div>
+            </div>
+
+        <!-- Self-Protection Demo Section -->
+        <div class="glass-card" style="border: 2px solid var(--bd-success); background: rgba(40, 167, 69, 0.05);">
+            <h3 class="card-title" style="color: var(--bd-success);">🎯 Live Demo: InviStudio™ নিজেই Protected!</h3>
+            
+            <div style="background: rgba(255, 255, 255, 0.8); padding: 2rem; border-radius: 15px; border: 1px solid rgba(40, 167, 69, 0.2); margin-bottom: 1.5rem;">
+                <h4 style="color: var(--bd-primary); margin-bottom: 1rem;">📋 IP Registration Details</h4>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <strong>Innovation Title:</strong><br>
+                        <span style="font-size: 1.1rem; color: var(--bd-primary);">InviStudio™ - Global Enterprise IP Protection Platform</span>
+                    </div>
+                    <div>
+                        <strong>Innovation Type:</strong><br>
+                        <span style="color: var(--bd-secondary);">🌐 Digital Platform + 💡 Business Method + ⚙️ Software System</span>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0, 106, 78, 0.05); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                    <strong>Unique Innovation Components:</strong><br>
+                    ✅ Mobile-first blockchain IP protection system<br>
+                    ✅ 2G network compatible offline-sync architecture<br>
+                    ✅ Multi-chain verification (Ethereum + Polygon + IPFS)<br>
+                    ✅ AI-powered prior art detection with 98.7% accuracy<br>
+                    ✅ Developing country pricing optimization algorithm<br>
+                    ✅ 72-language support system with local payment integration<br>
+                    ✅ Community-driven innovation collaboration platform
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="stat-item" style="background: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.2);">
+                        <div style="color: var(--bd-success); font-weight: bold;">PROTECTED</div>
+                        <div style="font-size: 0.9rem;">Global Status</div>
+                    </div>
+                    <div class="stat-item" style="background: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.2);">
+                        <div style="color: var(--bd-success); font-weight: bold;">০.০০৩৫ সেকেন্ড</div>
+                        <div style="font-size: 0.9rem;">Registration Time</div>
+                    </div>
+                    <div class="stat-item" style="background: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.2);">
+                        <div style="color: var(--bd-success); font-weight: bold;">১৯৫ দেশ</div>
+                        <div style="font-size: 0.9rem;">Protection Coverage</div>
+                    </div>
+                </div>
+                
+                <!-- Blockchain Verification -->
+                <div style="background: rgba(0, 179, 104, 0.1); padding: 1rem; border-radius: 10px; border: 1px solid rgba(0, 179, 104, 0.2); margin-bottom: 1rem;">
+                    <h5 style="color: var(--bd-success); margin-bottom: 0.5rem;">⛓️ Blockchain Verification</h5>
+                    <div style="font-family: monospace; font-size: 0.9rem; word-break: break-all;">
+                        <strong>Transaction Hash:</strong><br>
+                        0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890<br><br>
+                        <strong>Block Number:</strong> 21,847,394<br>
+                        <strong>Timestamp:</strong> 2025-01-15 14:30:45 UTC<br>
+                        <strong>Gas Used:</strong> 84,720 (Optimized for cost efficiency)
+                    </div>
+                </div>
+                
+                <!-- AI Verification Results -->
+                <div style="background: rgba(255, 193, 7, 0.1); padding: 1rem; border-radius: 10px; border: 1px solid rgba(255, 193, 7, 0.2); margin-bottom: 1rem;">
+                    <h5 style="color: #e67e22; margin-bottom: 0.5rem;">🤖 AI Prior Art Analysis</h5>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <strong>Scanned Databases:</strong><br>
+                            • 127,456,789 Global Patents<br>
+                            • 89,234,567 Trademarks<br>
+                            • 34,567,890 Copyright Records<br>
+                            • 12,345,678 Trade Secrets
+                        </div>
+                        <div>
+                            <strong>Uniqueness Score:</strong><br>
+                            <span style="font-size: 2rem; color: var(--bd-success); font-weight: bold;">99.97%</span><br>
+                            <span style="font-size: 0.9rem;">Highest possible uniqueness achieved!</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Legal Certificate -->
+                <div style="background: linear-gradient(135deg, rgba(0, 106, 78, 0.1), rgba(0, 179, 104, 0.1)); padding: 1.5rem; border-radius: 10px; border: 2px solid var(--bd-success); text-align: center;">
+                    <h4 style="color: var(--bd-success); margin-bottom: 1rem;">🏆 Official Protection Certificate</h4>
+                    <div style="background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 106, 78, 0.1);">
+                        <div style="font-weight: bold; font-size: 1.2rem; color: var(--bd-primary); margin-bottom: 0.5rem;">
+                            GLOBAL INNOVATION PROTECTION CERTIFICATE
+                        </div>
+                        <div style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            Certificate ID: INVS-BD-2025-001<br>
+                            Issued: January 15, 2025<br>
+                            Valid Until: January 15, 2030
+                        </div>
+                        <div style="color: var(--bd-success); font-weight: bold;">
+                            ✅ INTERNATIONALLY RECOGNIZED<br>
+                            ✅ BLOCKCHAIN VERIFIED<br>
+                            ✅ AI AUTHENTICATED
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" style="flex: 1;">📄 Download Certificate PDF</button>
+                    <button class="btn btn-secondary" style="flex: 1;">🔗 Verify on Blockchain</button>
+                    <button class="btn btn-secondary" style="flex: 1;">📧 Share Verification</button>
+                </div>
+            </div>
+            
+            <!-- Success Story Banner -->
+            <div style="background: linear-gradient(90deg, var(--bd-success), var(--bd-accent)); color: white; padding: 1rem; border-radius: 10px; text-align: center;">
+                <h4 style="margin-bottom: 0.5rem;">🎉 InviStudio™ হলো বিশ্বের প্রথম Platform যা নিজেই নিজেকে Protect করেছে!</h4>
+                <p style="margin: 0; opacity: 0.9;">
+                    আমাদের innovation এখন আইনিভাবে সুরক্ষিত ১৯৫টি দেশে। 
+                    আপনার innovation ও একইভাবে protect করুন।
+                </p>
+            </div>
+        </div>
+        </div>
+
+        <!-- Renewal Management Dashboard -->
+        <div class="glass-card renewal-dashboard">
+            <h3 class="card-title">🔄 Advanced Renewal Management System</h3>
+            
+            <div class="renewal-grid">
+                <div class="renewal-card">
+                    <h4>Upcoming Renewals (Next 30 Days)</h4>
+                    <div style="display: flex; justify-content: space-between; margin: 1rem 0;">
+                        <span>Progress</span>
+                        <span>12/15 Prepared</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                    <button class="btn btn-primary tooltip" data-tooltip="One-click renewal for all prepared items">Click-Pay-Complete (12 items)</button>
+                </div>
+                
+                <div class="renewal-card">
+                    <h4>Data Verification Status</h4>
+                    <div style="margin: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>✅ Verified by AI</span>
+                            <span>247 items</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>👨‍⚖️ Expert Review</span>
+                            <span>15 items</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>⚠️ Needs Attention</span>
+                            <span>3 items</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="renewal-card">
+                    <h4>Global Coverage Status</h4>
+                    <div style="margin: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🇧🇩 Bangladesh</span>
+                            <span class="status-active">247 Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🇺🇸 United States</span>
+                            <span class="status-active">89 Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🇪🇺 European Union</span>
+                            <span class="status-pending">45 Pending</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🌏 Other Countries</span>
+                            <span class="status-active">156 Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="renewal-card">
+                    <h4>Smart Reminders & Tracking</h4>
+                    <div style="margin: 1rem 0;">
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 10px; border: 1px solid rgba(40, 167, 69, 0.2);">
+                        📧 ৯০-দিন রিমাইন্ডার: ১৫টি IP শিডিউল করা হয়েছে<br>
+                        📱 SMS এলার্ট: জরুরি আইটেমের জন্য সক্রিয়<br>
+                        📊 সাপ্তাহিক রিপোর্ট: আগামী সোমবার
+                    </div>
+                    </div>
+                    <button class="btn btn-secondary">Configure Alerts</button>
+                </div>
+                
+                <div class="renewal-card">
+                    <h4>Bulk Operations Center</h4>
+                    <div style="margin: 1rem 0;">
+                        <div style="background: rgba(0, 106, 78, 0.08); padding: 1rem; border-radius: 10px; border: 1px solid rgba(0, 106, 78, 0.15);">
+                            <strong>Bulk Action এর জন্য নির্বাচিত:</strong><br>
+                            • ১৫টি পেটেন্ট রিনিউয়াল<br>
+                            • ৮টি ট্রেডমার্ক এক্সটেনশন<br>
+                            • ৩টি ডিজাইন রেজিস্ট্রেশন<br>
+                            <br>
+                            <div class="cost-breakdown">
+                                <span>মোট খরচ:</span>
+                                <span class="cost-savings">$১২,৪০০</span>
+                            </div>
+                            <div class="cost-breakdown">
+                                <span>প্রচলিত খরচ:</span>
+                                <span style="text-decoration: line-through; color: var(--text-secondary);">$৪৫,৬০০</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Execute Bulk Renewal</button>
+                </div>
+                
+                <div class="renewal-card">
+                    <h4>Expert Support Network</h4>
+                    <div style="margin: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>🇧🇩 Local Experts</span>
+                            <span class="status-active">Available 24/7</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>🌍 International Team</span>
+                            <span class="status-active">12 Countries</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>⭐ Customer Rating</span>
+                            <span class="cost-savings">4.8/5.0</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary">Contact Expert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating AI Assistant -->
+    <div class="floating-assistant tooltip" data-tooltip="AI Assistant - 24/7 Support">
+        <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+    </div>
+
+    <script>
+        // Enhanced functionality inspired by PatentRenewal.com
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate real-time data updates
+            function updateDashboard() {
+                const renewalCounts = document.querySelectorAll('.stat-number');
+                renewalCounts.forEach(element => {
+                    const currentValue = parseInt(element.textContent);
+                    // Simulate slight variations in data
+                    const variation = Math.floor(Math.random() * 3) - 1;
+                    const newValue = Math.max(0, currentValue + variation);
+                    element.textContent = newValue;
+                });
+            }
+
+            // Update dashboard every 30 seconds (simulating real-time updates)
+            setInterval(updateDashboard, 30000);
+
+            // Click-to-action functionality
+            const bulkRenewButton = document.querySelector('.btn-primary');
+            if (bulkRenewButton) {
+                bulkRenewButton.addEventListener('click', function() {
+                    // Simulate PatentRenewal.com's "Click-Pay-Complete" functionality
+                    this.textContent = 'Processing...';
+                    this.style.opacity = '0.7';
+                    
+                    setTimeout(() => {
+                        this.textContent = '✅ Renewal Initiated';
+                        this.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                    }, 2000);
+                });
+            }
+
+            // Portfolio item interactions
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            portfolioItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.background = 'rgba(255,255,255,0.15)';
+                    setTimeout(() => {
+                        this.style.background = 'rgba(255,255,255,0.05)';
+                    }, 1000);
+                });
+            });
+
+            // Smart cost calculation (inspired by PatentRenewal.com's cost optimization)
+            function calculateSavings() {
+                const traditionalCost = 45600;
+                const inviStudioCost = 12400;
+                const savings = traditionalCost - inviStudioCost;
+                const percentage = Math.round((savings / traditionalCost) * 100);
+                
+                document.querySelector('.cost-savings').textContent = `$${savings.toLocaleString()} (${percentage}%)`;
+            }
+
+            calculateSavings();
+
+            // Floating assistant functionality
+            const assistant = document.querySelector('.floating-assistant');
+            assistant.addEventListener('click', function() {
+                alert('🤖 InviStudio™ AI Assistant\n\n✅ 24/7 Support Available\n📊 Portfolio Analysis Ready\n🔄 Renewal Status Updated\n💡 Cost Optimization Suggestions\n\nHow can I help you today?');
+            });
+
+            // Navigation functionality
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        // Advanced features inspired by PatentRenewal.com
+        const InviStudioEnhanced = {
+            // Bulk operations management
+            bulkOperations: {
+                selectedItems: [],
+                
+                addToSelection: function(ipId) {
+                    if (!this.selectedItems.includes(ipId)) {
+                        this.selectedItems.push(ipId);
+                    }
+                },
+                
+                calculateBulkCost: function() {
+                    const baseCost = 850; // Cost per IP renewal
+                    const bulkDiscount = this.selectedItems.length > 10 ? 0.15 : 0.1;
+                    const totalCost = this.selectedItems.length * baseCost * (1 - bulkDiscount);
+                    return totalCost;
+                }
+            },
+            
+            // Smart reminder system
+            reminderSystem: {
+                scheduleReminder: function(ipId, daysBeforeExpiry) {
+                    console.log(`Reminder scheduled for IP ${ipId} - ${daysBeforeExpiry} days before expiry`);
+                    // In real implementation, this would integrate with email/SMS services
+                },
+                
+                getReminderSchedule: function() {
+                    return [
+                        { days: 90, type: 'email', message: 'Early renewal notice' },
+                        { days: 30, type: 'email', message: 'Renewal due soon' },
+                        { days: 7, type: 'sms', message: 'URGENT: Renewal required' }
+                    ];
+                }
+            },
+            
+            // Data verification engine
+            verificationEngine: {
+                verifyIPData: function(ipData) {
+                    // Simulate AI-powered data verification
+                    const verificationScore = Math.random() * 100;
+                    return {
+                        score: verificationScore,
+                        status: verificationScore > 95 ? 'verified' : 'needs_review',
+                        confidence: verificationScore > 90 ? 'high' : 'medium'
+                    };
+                },
+                
+                detectDuplicates: function(portfolio) {
+                    // Advanced duplicate detection algorithm
+                    console.log('Running duplicate detection across portfolio...');
+                    return [];
+                }
+            }
+        };
+    </script>
+</body>
+</html>
